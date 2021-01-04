@@ -7,12 +7,13 @@ from .models import *
 from .models import TrainingValue
 from .models import Training as TrainingModel
 from .forms import *
-import numpy as np
 
 # Create your views here.
 def pakarKNN(request):
     trainings = TrainingModel.objects.all()
+    amount_training = trainings.count()
     attr = Attribute.objects.all()
+    amount_attr = attr.count()
     raw = []
     for training in trainings:
         dtrain   = TrainingValue.objects.filter(training_id=training.id)
@@ -20,21 +21,59 @@ def pakarKNN(request):
         for train in dtrain:
             attribute.append(train.value)
         raw.append([attribute, training.result])
+    print("raw: ",raw)
     if request.method == "POST":
-        a = {}
-        a['a'] = request.POST.get('value', False)
-        print(a)
-        # for i in a["value[]"]:
-        #     print(i)
-        # print(request.POST.get('value[]','null'))
-        # insert = request.POST.get('value[]', '')
-        # print(insert)
-        pass
+        # Menampung formulir insert
+        insert = []
+        for atr in attr:
+            insert.append(float(request.POST.get('value-'+str(atr.id),'invalid')))
+        print("insert: ",insert)
+
+        bound = []
+        #Metode Manhattan
+        manhattan = []
+        for i in range(amount_training): #training
+            distance = 0
+            for j in range(amount_attr): #atribut
+                distance += abs(insert[j]-raw[i][0][j])
+            bound.append({"d":distance,"r":raw[i][1]})
+            manhattan.append(distance)
+        print('manhattan: ', manhattan)
+        #KNN
+        hasil = knn(bound, manhattan, 9, amount_training)
+        print(hasil)
     else:
-        pass
+        hasil = ''
+    return render(request, 'pakar/knn.html', {'attr':attr, 'hasil':hasil})
 
+def knn(data, manhattan, k, max_k):
+    manhattan.sort()
+    result = {}
+    for d in data:
+        if d['d'] <= manhattan[k-1]:
+            result[d['r'].name] = result.get(d['r'].name, 0) + 1
+            print(d['r'].name)
+        else:
+            print('-')
+    #Frequency
+    sorted_dict = {}
+    sorted_keys = sorted(result, key=result.get, reverse=True)
+    for w in sorted_keys:
+        sorted_dict[w] = result[w]
+    result = sorted_dict
+    print(result)
 
-    return render(request, 'pakar/knn.html', {'attr':attr})
+    #Perbaikan
+    key1 = list(result.keys())[0]
+    key2 = list(result.keys())[1]
+
+    if ( result[key1]==result[key2] and k+4 < max_k ):
+        knn(data, manhattan, k+4, max_k)
+    return {
+        'result' : key1,
+        'detail' : result,
+        'k'      : k,
+    }
 
 def index(request):
     return render(request, 'front/landing.html')
@@ -58,9 +97,8 @@ def createTraining(request):
     form = TrainingForm()
     if request.method == "POST":
         form = TrainingForm(request.POST)
-        print(request.POST)
         if form.is_valid():
-            # form.save()
+            form.save()
             return redirect(reverse('training'))
     data = {'form':form}
     return render(request, 'training/create.html', data)

@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Training{% endblock title %}
+
+{% block breadcrumb %}
+<div class="btn-group float-right">
+    <ol class="breadcrumb hide-phone p-0 m-0">
+        <li class="breadcrumb-item"><a href="{% url 'dasbor' %}">Dasbor</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'training' %}">Pakar</a></li>
+        <li class="breadcrumb-item active">KNN</li>
+    </ol>
+</div>
+<h4 class="page-title">KNN</h4>
+{%endblock%}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    {% if request.POST%}
+    <div class="card m-b-30">
+        <div class="card-body">
+          <h4 class="mt-0 header-title">Hasil</h4>
+          <p class="text-muted m-b-20 font-14">Kecocokan Mahasiswa Sebagai Asisten dari <strong>Laboratorium {{hasil.result}}</strong></p>
+          <h4 class="mt-0 header-title">Rincian Kecocokan</h4>
+          <p>Hasil yang ditampilkan dengan nilai <i>ketetanggaan (K)</i> sebesar {{hasil.k}}</p>
+          <ul>
+              {% for key, value in hasil.detail.items %}
+              <li>{{key}} - {{value}}</li>
+              {% endfor %}
+          </ul>
+        </div>
+    </div>
+    {% endif %}
+    <div class="card m-b-30">
+        <div class="card-body">
+            <h4 class="mt-0 header-title">Sistem Penunjang Keputusan</h4>
+            <p class="text-muted m-b-30 font-14">Masukkan data mahasiswa sebagai berikut</p>
+            <form class="" action="" method="post">
+              {% csrf_token %}
+              {{ formset.management_form }}
+              {% for atribut in attr %}
+              <label for="uji-{{atribut.id}}">{{atribut}}</label>
+              <input type="number" name="value-{{atribut.id}}" class="form-control" step="0.01" required id="uji-{{atribut.id}}">
+              {% endfor %}
+        </div>
+              <input class="btn btn-success mt-3" type="submit" name="submit" value="Simpan">
+            </form>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}
