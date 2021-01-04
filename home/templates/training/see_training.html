@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Data Training{% endblock title %}
+
+{% block css %}
+<link href="{% static '/plugins/datatables/dataTables.bootstrap4.min.css' %}" rel="stylesheet" type="text/css" />
+<link href="{% static '/plugins/datatables/buttons.bootstrap4.min.css' %}" rel="stylesheet" type="text/css" />
+{% endblock css %}
+
+{% block breadcrumb %}
+<div class="btn-group float-right">
+    <ol class="breadcrumb hide-phone p-0 m-0">
+        <li class="breadcrumb-item"><a href="{% url 'dasbor' %}">Dasbor</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'training' %}">Training</a></li>
+        <li class="breadcrumb-item active">Lihat Nilai Training</li>
+    </ol>
+</div>
+<h4 class="page-title">Lihat Data Training</h4>
+{%endblock%}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="card m-b-30">
+        <div class="card-body">
+            <h4 class="mt-0 header-title">Lihat Data Training</h4>
+            <table id="datatable-buttons" class="table table-striped table-bordered dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                <thead>
+                <tr>
+                    <th>Atribut</th>
+                    <th>Nilai</th>
+                    <th>Aksi</th>
+                </tr>
+                </thead>
+
+                <tbody style="overflow-x: scroll;">
+                {% for training in dtrain %}
+                <tr>
+                    <td>{{training.attribute_id}}</td>
+                    <td>{{training.value}}</td>
+                    <td><a href="{% url 'update_data_training' training.id %}" class="btn btn-warning"><span class="fa fa-pencil"></span></a></td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}
+
+{% block js %}
+<script src="{% static '/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static '/plugins/datatables/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static '/plugins/datatables/dataTables.responsive.min.js' %}"></script>
+<script src="{% static '/plugins/datatables/responsive.bootstrap4.min.js' %}"></script>
+
+<script src="{% static '/plugins/datatables/dataTables.buttons.min.js' %}"></script>
+<script src="{% static '/plugins/datatables/buttons.bootstrap4.min.js' %}"></script>
+<script src="{% static '/plugins/datatables/jszip.min.js' %}"></script>
+<script src="{% static '/plugins/datatables/pdfmake.min.js' %}"></script>
+<script src="{% static '/plugins/datatables/vfs_fonts.js' %}"></script>
+<script src="{% static '/plugins/datatables/buttons.html5.min.js' %}"></script>
+<script src="{% static '/plugins/datatables/buttons.print.min.js' %}"></script>
+<script src="{% static '/plugins/datatables/buttons.colVis.min.js' %}"></script>
+
+<script src="{% static '/pages/datatables.init.js' %}"></script>
+{% endblock js %}
