@@ -7,10 +7,34 @@ from .models import *
 from .models import TrainingValue
 from .models import Training as TrainingModel
 from .forms import *
+import numpy as np
 
 # Create your views here.
 def pakarKNN(request):
-    return render(request, 'pakar/knn.html')
+    trainings = TrainingModel.objects.all()
+    attr = Attribute.objects.all()
+    raw = []
+    for training in trainings:
+        dtrain   = TrainingValue.objects.filter(training_id=training.id)
+        attribute = []
+        for train in dtrain:
+            attribute.append(train.value)
+        raw.append([attribute, training.result])
+    if request.method == "POST":
+        a = {}
+        a['a'] = request.POST.get('value', False)
+        print(a)
+        # for i in a["value[]"]:
+        #     print(i)
+        # print(request.POST.get('value[]','null'))
+        # insert = request.POST.get('value[]', '')
+        # print(insert)
+        pass
+    else:
+        pass
+
+
+    return render(request, 'pakar/knn.html', {'attr':attr})
 
 def index(request):
     return render(request, 'front/landing.html')
@@ -34,8 +58,9 @@ def createTraining(request):
     form = TrainingForm()
     if request.method == "POST":
         form = TrainingForm(request.POST)
+        print(request.POST)
         if form.is_valid():
-            form.save()
+            # form.save()
             return redirect(reverse('training'))
     data = {'form':form}
     return render(request, 'training/create.html', data)
